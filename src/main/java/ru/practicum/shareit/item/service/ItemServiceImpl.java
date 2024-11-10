@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.AccessNotAllowedException;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -44,9 +45,9 @@ public class ItemServiceImpl implements ItemService {
             throw new AccessNotAllowedException("Changing of item's request is forbidden");
 
         //Заносим новые данные в разрешенные к изменениям поля
-        if (itemDto.getName() != null && !itemDto.getName().isBlank())
+        if (!Strings.isBlank(itemDto.getName()))
             oldItem.setName(itemDto.getName());
-        if (itemDto.getDescription() != null && !itemDto.getDescription().isBlank())
+        if (!Strings.isBlank(itemDto.getDescription()))
             oldItem.setDescription(itemDto.getDescription());
         if (itemDto.getAvailable() != null)
             oldItem.setAvailable(itemDto.getAvailable());

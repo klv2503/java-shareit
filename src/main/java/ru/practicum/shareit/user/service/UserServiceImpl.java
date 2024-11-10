@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DuplicateDataException;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -30,9 +31,9 @@ public class UserServiceImpl implements UserService {
         User oldUser = userStorage.getUserById(userDto.getId());
         if (oldUser == null)
             throw new NotFoundException("User not found", userDto);
-        if (userDto.getName() != null && !userDto.getName().isBlank())
+        if (!Strings.isBlank(userDto.getName()))
             oldUser.setName(userDto.getName());
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank())
+        if (!Strings.isBlank(userDto.getEmail()))
             oldUser.setEmail(userDto.getEmail());
         if (userStorage.isEmailExists(oldUser.getId(), oldUser.getEmail()))
             throw new DuplicateDataException("This e-mail already exists in base", userDto);
