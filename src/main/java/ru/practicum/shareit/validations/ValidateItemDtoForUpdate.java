@@ -8,8 +8,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 public class ValidateItemDtoForUpdate implements ConstraintValidator<NotEmptyItemDto, ItemDto> {
     @Override
     public boolean isValid(ItemDto itemDto, ConstraintValidatorContext constraintValidatorContext) {
-        return !Strings.isBlank(itemDto.getName()) &&
-                !Strings.isBlank(itemDto.getDescription()) &&
+        return !Strings.isBlank(itemDto.getName()) ||
+                !Strings.isBlank(itemDto.getDescription()) ||
                 itemDto.getAvailable() != null;
     }
 }
