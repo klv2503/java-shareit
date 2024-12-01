@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.validations.NotEmptyUserDto;
-import ru.practicum.shareit.validations.OnCreate;
-import ru.practicum.shareit.validations.OnUpdate;
+import ru.practicum.shareit.auxiliary.validations.NotEmptyUserDto;
+import ru.practicum.shareit.auxiliary.validations.OnCreate;
+import ru.practicum.shareit.auxiliary.validations.OnUpdate;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -62,6 +62,9 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+        log.info("\nПолучен запрос получение всех user");
+        List<UserDto> users = userService.getAllUsers();
+        log.info("\nПолучен список из {} персон", users.size());
+        return users;
     }
 }

@@ -1,26 +1,59 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.dto.ShortCommentDto;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.User;
+
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
  */
-@Data
+@Entity
+@Table(name = "items")
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 public class Item {
 
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //— уникальный идентификатор вещи;
 
+    @Column(name = "name")
     private String name; //— краткое название;
 
+    @Column(name = "description")
     private String description; //— развёрнутое описание;
 
+    @Column(name = "is_available")
     private Boolean available; //— статус о том, доступна или нет вещь для аренды;
 
-    private Long owner; //— владелец вещи;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner; //— владелец вещи;
 
-    private Long request; //— если вещь была создана по запросу другого пользователя,
-    // то в этом поле будет храниться ссылка на соответствующий запрос.
+    @OneToOne(optional = true)
+    @JoinColumn(name = "request_id", nullable = true)
+    private ItemRequest request; //— ссылка на соответствующий запрос, по которому вещь была создана
+
+    //Ниже перечислены transient-поля
+    @Transient
+    private Booking lastBooking;
+
+    @Transient
+    private Booking nextBooking;
+
+    @Transient
+    private List<ShortCommentDto> comments;
+
+    public Item(Long id) {
+        this.id = id;
+    }
 
 }
