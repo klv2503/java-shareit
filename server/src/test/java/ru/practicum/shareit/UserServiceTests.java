@@ -3,7 +3,9 @@ package ru.practicum.shareit;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 
 public class UserServiceTests {
@@ -35,6 +38,16 @@ public class UserServiceTests {
     private final UserService service;
 
     private final UserMapper mapper;
+
+    @BeforeAll
+    public void setTestUsers() {
+        UserDto firstUserDto = new UserDto("First user", "first@email.com");
+        service.createUser(firstUserDto);
+        UserDto secondUserDto = new UserDto("Second user", "second@email.com");
+        service.createUser(secondUserDto);
+        UserDto thirdUserDto = new UserDto("Third user", "third@email.com");
+        service.createUser(thirdUserDto);
+    }
 
     @Test
     void contextTest() {
@@ -63,12 +76,6 @@ public class UserServiceTests {
     @Test
     //В UserServiceImpl нет реально крупных методов, этот тоже не тянет, но хоть что-то
     void shouldGetAllUsers() {
-        UserDto firstUserDto = new UserDto("Name of User", "some@email.com");
-        service.createUser(firstUserDto);
-        UserDto secondUserDto = new UserDto("Second user", "second@email.com");
-        service.createUser(secondUserDto);
-        UserDto thirdUserDto = new UserDto("Third user", "third@email.com");
-        service.createUser(thirdUserDto);
 
         TypedQuery<User> query = em.createQuery("Select u from User u ", User.class);
         List<UserDto> users = mapper.mapUsersListToDtoList(query.getResultList());
