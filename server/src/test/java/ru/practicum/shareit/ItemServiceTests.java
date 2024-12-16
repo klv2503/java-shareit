@@ -52,7 +52,7 @@ public class ItemServiceTests {
 
     @BeforeAll
     public void setTestData() {
-        UserDto firstUserDto = new UserDto("Name of User", "some@email.com");
+        UserDto firstUserDto = new UserDto("First user", "first@email.com");
         userService.createUser(firstUserDto);
         UserDto secondUserDto = new UserDto("Second user", "second@email.com");
         userService.createUser(secondUserDto);
