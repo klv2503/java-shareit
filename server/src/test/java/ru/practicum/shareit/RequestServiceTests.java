@@ -66,13 +66,12 @@ public class RequestServiceTests {
     @Test
     public void shouldAddNewRequest() {
 
-        System.out.println(userService.getAllUsers());
         long requestorId = 3L;
         RequestDto newRequest = RequestDto.builder()
                 .description("Abracadabra")
                 .build();
         requestService.addNewRequest(requestorId, newRequest);
-        User user = new User(3L,"Third user", "third@email.com");
+        User user = new User(3L, "Third user", "third@email.com");
 
         TypedQuery<ItemRequest> query =
                 em.createQuery("Select r from ItemRequest r where r.requestor = :requestor", ItemRequest.class);
@@ -87,7 +86,6 @@ public class RequestServiceTests {
     @Test
     public void shouldGetAllUsersRequest() {
 
-        System.out.println(userService.getAllUsers());
         long requestorId = 3L;
         RequestDto newRequest = RequestDto.builder()
                 .description("Abracadabra")
@@ -97,7 +95,7 @@ public class RequestServiceTests {
                 .description("Once more")
                 .build();
         requestService.addNewRequest(requestorId, newRequest2);
-        User user = new User(3L,"Third user", "third@email.com");
+        User user = new User(3L, "Third user", "third@email.com");
 
         TypedQuery<ItemRequest> query =
                 em.createQuery("Select r from ItemRequest r where r.requestor = :requestor", ItemRequest.class);
@@ -114,7 +112,6 @@ public class RequestServiceTests {
     @Test
     public void shouldGetAllRequestsOfAnotherUsers() {
 
-        System.out.println(userService.getAllUsers());
         long requestorId = 3L;
         RequestDto newRequest = RequestDto.builder()
                 .description("Abracadabra")
@@ -125,7 +122,7 @@ public class RequestServiceTests {
                 .description("Once more")
                 .build();
         requestService.addNewRequest(requestorId, newRequest2);
-        User user = new User(2L,"Third user", "third@email.com");
+        User user = new User(2L, "Third user", "third@email.com");
 
         TypedQuery<ItemRequest> query =
                 em.createQuery("Select r from ItemRequest r where r.requestor <> :requestor", ItemRequest.class);
@@ -142,7 +139,6 @@ public class RequestServiceTests {
     @Test
     public void shouldGetRequestById() {
 
-        System.out.println(userService.getAllUsers());
         long requestorId = 3L;
         RequestDto newRequest = RequestDto.builder()
                 .description("Abracadabra")
@@ -163,6 +159,27 @@ public class RequestServiceTests {
         assertNotNull(itemRequest);
         assertEquals(itemRequest.getDescription(), newRequest2.getDescription());
 
+    }
+
+    @Test
+    public void getRequest_whenCorrectId_thenGet() {
+        long requestorId = 3L;
+        RequestDto newRequest = RequestDto.builder()
+                .description("Abracadabra")
+                .build();
+        requestService.addNewRequest(requestorId, newRequest);
+        User user = new User(requestorId, "Third user", "third@email.com");
+
+        TypedQuery<ItemRequest> query =
+                em.createQuery("Select r from ItemRequest r where r.requestor = :requestor", ItemRequest.class);
+        ItemRequest itemRequest = query.setParameter("requestor", user)
+                .getSingleResult();
+        long requestId = itemRequest.getId();
+
+        ItemRequest testedRequest = requestService.getRequest(requestId);
+
+        assertNotNull(itemRequest);
+        assertEquals(itemRequest, testedRequest);
     }
 
 }

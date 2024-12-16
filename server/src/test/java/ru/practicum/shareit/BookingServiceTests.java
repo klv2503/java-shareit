@@ -138,6 +138,78 @@ public class BookingServiceTests {
     }
 
     @Test
+    public void getBooking_whenCorrectId_thenGet() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(1L)
+                .booker(3L)
+                .status("WAITING")
+                .build();
+        bookingService.addNewBooking(newBooking);
+        User user = userService.getUser(3L);
+        TypedQuery<Booking> query =
+                em.createQuery("Select b from Booking b where b.booker = :booker", Booking.class);
+        Booking receivedBooking = query.setParameter("booker", user).getSingleResult();
+        long bookingId = receivedBooking.getId();
+
+        Booking testedBooking = bookingService.getBooking(bookingId);
+        assertNotNull(testedBooking);
+        assertEquals(newBooking.getItemId(), testedBooking.getItem().getId());
+        assertEquals(newBooking.getBooker(), testedBooking.getBooker().getId());
+        assertEquals(BookStatus.WAITING, testedBooking.getStatus());
+    }
+
+    @Test
+    public void getBooking_whenIncorrectId_thenNotFound() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(1L)
+                .booker(3L)
+                .status("WAITING")
+                .build();
+        bookingService.addNewBooking(newBooking);
+        assertThrows(NotFoundException.class, () -> bookingService.getBooking(100L));
+    }
+
+    @Test
+    public void getBookingInfo_whenCorrectId_thenGet() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(1L)
+                .booker(3L)
+                .status("WAITING")
+                .build();
+        bookingService.addNewBooking(newBooking);
+        User user = userService.getUser(3L);
+        TypedQuery<Booking> query =
+                em.createQuery("Select b from Booking b where b.booker = :booker", Booking.class);
+        Booking receivedBooking = query.setParameter("booker", user).getSingleResult();
+        long bookingId = receivedBooking.getId();
+
+        BookingOutputDto testedBooking = bookingService.getBookingInfo(bookingId);
+        assertNotNull(testedBooking);
+        assertEquals(newBooking.getItemId(), testedBooking.getItem().getId());
+        assertEquals(newBooking.getBooker(), testedBooking.getBooker().getId());
+        assertEquals(BookStatus.WAITING, testedBooking.getStatus());
+    }
+
+    @Test
+    public void getBookingInfo_whenIncorrectId_thenNotFound() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(1L)
+                .booker(3L)
+                .status("WAITING")
+                .build();
+        bookingService.addNewBooking(newBooking);
+        assertThrows(NotFoundException.class, () -> bookingService.getBooking(100L));
+    }
+
+    @Test
     public void shouldGetAllUsersBooking() {
         BookingInputDto booking1 = BookingInputDto.builder()
                 .start(LocalDateTime.now().plusSeconds(1L))

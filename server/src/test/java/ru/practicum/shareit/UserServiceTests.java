@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.auxiliary.exceptions.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -59,9 +60,8 @@ public class UserServiceTests {
     }
 
     @Test
-    void testCreateUser() {
+    public void testCreateUser() {
         UserDto userDto = new UserDto("Name of User", "noch_eine@email.com");
-
         service.createUser(userDto);
 
         TypedQuery<User> query = em.createQuery("Select u from User u where u.email = :email", User.class);
@@ -74,8 +74,38 @@ public class UserServiceTests {
     }
 
     @Test
-    //В UserServiceImpl нет реально крупных методов, этот тоже не тянет, но хоть что-то
-    void shouldGetAllUsers() {
+    public void getUserById_shouldGetUserDtoOfExistedUser() {
+        User user = service.getUser(1L);
+
+        assertNotNull(user);
+        assertEquals(1, user.getId());
+        assertEquals("First user", user.getName());
+        assertEquals("first@email.com", user.getEmail());
+    }
+
+    @Test
+    public void getUserById_shouldNotGetUserDto() {
+        assertThrows(NotFoundException.class, () -> service.getUserById(100L));
+    }
+
+
+    @Test
+    public void getUser_shouldGetExistedUser() {
+        User user = service.getUser(1L);
+
+        assertNotNull(user);
+        assertEquals(1, user.getId());
+        assertEquals("First user", user.getName());
+        assertEquals("first@email.com", user.getEmail());
+    }
+
+    @Test
+    public void getUser_shouldNotGetUser() {
+        assertThrows(NotFoundException.class, () -> service.getUser(100L));
+    }
+
+    @Test
+    public void shouldGetAllUsers() {
 
         TypedQuery<User> query = em.createQuery("Select u from User u ", User.class);
         List<UserDto> users = mapper.mapUsersListToDtoList(query.getResultList());

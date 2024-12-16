@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.ShareItServer;
+import ru.practicum.shareit.auxiliary.exceptions.DuplicateDataException;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
@@ -72,6 +74,18 @@ public class UserControllerTests {
 
         assertNotNull(mvcResult.getResponse());
         verify(service, times(1)).createUser(goodUser);
+    }
+
+    @SneakyThrows
+    @Test
+    public void createUser_whenDuplicateEmail_thenReturnConflict() {
+        UserDto user = new UserDto("First user", "first@email.com");
+        when(service.createUser(user))
+                .thenThrow(new DuplicateDataException("This e-mail already exists in base", user));
+
+        RequestBuilder request = getRequest(user);
+        mockMvc.perform(request)
+                .andExpect(status().isConflict());
     }
 
     @SneakyThrows

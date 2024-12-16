@@ -127,7 +127,8 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.mapCommentToCommentDto(commentRepository.save(comment));
     }
 
-    private Booking getItemsLastBooking(List<Booking> bookings) {
+    @Override
+    public Booking getItemsLastBooking(List<Booking> bookings) {
         LocalDateTime now = LocalDateTime.now();
         return bookings.stream()
                 .filter(b -> b.getEnd().isBefore(now))
@@ -135,7 +136,8 @@ public class ItemServiceImpl implements ItemService {
                 .orElse(null);
     }
 
-    private Booking getItemsNextBooking(List<Booking> bookings) {
+    @Override
+    public Booking getItemsNextBooking(List<Booking> bookings) {
         LocalDateTime now = LocalDateTime.now();
         return bookings.stream()
                 .filter(b -> b.getStart().isAfter(now))

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.comments.CommentDto;
 import ru.practicum.shareit.item.dto.comments.CommentInputDto;
 import ru.practicum.shareit.item.dto.items.ItemDto;
@@ -28,4 +29,8 @@ public interface ItemService {
     List<Item> getItemsList(User owner);
 
     CommentDto addNewComment(CommentInputDto commentInput);
+
+    Booking getItemsLastBooking(List<Booking> bookings);
+
+    Booking getItemsNextBooking(List<Booking> bookings);
 }
