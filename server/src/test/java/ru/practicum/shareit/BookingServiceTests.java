@@ -49,7 +49,7 @@ public class BookingServiceTests {
 
     @BeforeAll
     public void setTestData() {
-        UserDto firstUserDto = new UserDto("Name of User", "some@email.com");
+        UserDto firstUserDto = new UserDto("First user", "some@email.com");
         userService.createUser(firstUserDto);
         UserDto secondUserDto = new UserDto("Second user", "second@email.com");
         userService.createUser(secondUserDto);

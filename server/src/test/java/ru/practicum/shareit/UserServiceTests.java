@@ -74,6 +74,19 @@ public class UserServiceTests {
     }
 
     @Test
+    public void updateUser_whenCorrectData_thenUpdate() {
+        UserDto userDto = new UserDto(3L,"Name of User", "noch_eine@email.com");
+        service.updateUser(userDto);
+
+        TypedQuery<User> query = em.createQuery("Select u from User u where u.email = :email", User.class);
+        User user = query.setParameter("email", userDto.getEmail())
+                .getSingleResult();
+
+        assertNotNull(user);
+        assertEquals(userDto.getName(), user.getName());
+    }
+
+    @Test
     public void getUserById_shouldGetUserDtoOfExistedUser() {
         User user = service.getUser(1L);
 
@@ -87,7 +100,6 @@ public class UserServiceTests {
     public void getUserById_shouldNotGetUserDto() {
         assertThrows(NotFoundException.class, () -> service.getUserById(100L));
     }
-
 
     @Test
     public void getUser_shouldGetExistedUser() {
