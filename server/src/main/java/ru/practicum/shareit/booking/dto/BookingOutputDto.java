@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.model.BookStatus;
@@ -14,6 +16,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookingOutputDto {
 
@@ -24,6 +28,7 @@ public class BookingOutputDto {
     private LocalDateTime end;          // дата и время конца бронирования;
 
     private Item item;                  // вещь, которую пользователь бронирует;
+
     private User booker;                // пользователь, который осуществляет бронирование;
 
     private BookStatus status;          // статус бронирования

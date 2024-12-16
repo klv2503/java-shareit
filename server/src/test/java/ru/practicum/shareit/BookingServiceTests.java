@@ -170,6 +170,29 @@ public class BookingServiceTests {
         assertNotNull(bookListForTest);
         assertEquals(2, bookListForTest.size());
         assertEquals(bookControlList, bookListForTest);
+
+        bookListForTest =
+                bookingService.getAllUsersBookings(3L, "ALL", 0, 10);
+
+        assertNotNull(bookListForTest);
+        assertEquals(2, bookListForTest.size());
+        assertEquals(bookControlList, bookListForTest);
+
+        bookListForTest =
+                bookingService.getAllUsersBookings(3L, "PAST", 0, 10);
+
+        assertEquals(0, bookListForTest.size());
+
+        bookListForTest =
+                bookingService.getAllUsersBookings(3L, "FUTURE", 0, 10);
+
+        assertEquals(2, bookListForTest.size());
+
+        bookListForTest =
+                bookingService.getAllUsersBookings(3L, "CURRENT", 0, 10);
+
+        assertEquals(0, bookListForTest.size());
+
     }
 
     @Test
@@ -209,6 +232,29 @@ public class BookingServiceTests {
         assertNotNull(bookListForTest);
         assertEquals(2, bookListForTest.size());
         assertEquals(bookControlList, bookListForTest);
+
+        bookListForTest =
+                bookingService.getAllOwnersBookings(items, "ALL");
+
+        assertNotNull(bookListForTest);
+        assertEquals(2, bookListForTest.size());
+        assertEquals(bookControlList, bookListForTest);
+
+        bookListForTest =
+                bookingService.getAllOwnersBookings(items, "PAST");
+
+        assertEquals(0, bookListForTest.size());
+
+        bookListForTest =
+                bookingService.getAllOwnersBookings(items, "FUTURE");
+
+        assertEquals(2, bookListForTest.size());
+
+        bookListForTest =
+                bookingService.getAllOwnersBookings(items, "CURRENT");
+
+        assertEquals(0, bookListForTest.size());
+
     }
 
 }

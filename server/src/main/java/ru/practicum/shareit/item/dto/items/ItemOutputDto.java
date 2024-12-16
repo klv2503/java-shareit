@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.dto.items;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.comments.ShortCommentDto;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemOutputDto {
     private Long id; //— уникальный идентификатор вещи;
 
