@@ -16,7 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GatewayErrorHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Object> handlerNumberFormatException(final NumberFormatException e) {
+    public ResponseEntity<Object> handlerNumberFormatException(final MethodArgumentTypeMismatchException e) {
         StackTraceElement sElem = e.getStackTrace()[0];
         String className = sElem.getClassName();
         String str = className.substring(className.lastIndexOf(".") + 1);

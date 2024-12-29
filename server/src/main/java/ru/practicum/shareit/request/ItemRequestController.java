@@ -42,7 +42,7 @@ public class ItemRequestController {
     //могли бы ответить. Запросы сортируются по дате создания от более новых к более старым.
     public ResponseEntity<List<RequestDto>> getAllRequests(@RequestHeader("X-Sharer-User-Id") Long id) {
         log.info("\nServer: Получен запрос пользователя {} на поиск чужих запросов", id);
-        return ResponseEntity.ok(requestService.getAllRequests(id));
+        return ResponseEntity.ok(requestService.getAllAnotherUsersRequests(id));
     }
 
     @GetMapping("/{requestId}")

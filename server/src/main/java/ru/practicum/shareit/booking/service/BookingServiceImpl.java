@@ -43,6 +43,8 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingInputDto.getItemId())
                 .orElseThrow(() ->
                         new NotFoundException("Item " + bookingInputDto.getItemId() + " not found", bookingInputDto));
+        if (Objects.equals(booking.getBooker().getId(), item.getOwner().getId()))
+            throw new ValidationException("User can't book own item", booking);
 
         if (!item.getAvailable())
             throw new ValidationException("Item is not available", item);

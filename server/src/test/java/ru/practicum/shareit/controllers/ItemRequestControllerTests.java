@@ -80,7 +80,7 @@ public class ItemRequestControllerTests {
     @Test
     public void getAllRequests_whenValidPathVariable_thenGetting() {
         long header = 1L;
-        when(service.getAllRequests(anyLong())).thenReturn(List.of());
+        when(service.getAllAnotherUsersRequests(anyLong())).thenReturn(List.of());
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/requests/all")
                 .accept(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ public class ItemRequestControllerTests {
                 .contentType(MediaType.APPLICATION_JSON);
         MvcResult mvcResult = mockMvc.perform(request).andExpect(status().isOk()).andReturn();
         assertNotNull(mvcResult.getResponse());
-        verify(service, times(1)).getAllRequests(header);
+        verify(service, times(1)).getAllAnotherUsersRequests(header);
     }
 
     @SneakyThrows

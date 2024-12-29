@@ -1,15 +1,14 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.services;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.auxiliary.exceptions.AccessNotAllowedException;
 import ru.practicum.shareit.auxiliary.exceptions.NotFoundException;
@@ -24,7 +23,6 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -36,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Sql({"/schema.sql", "/data.sql"})
 @ActiveProfiles("test")
 public class ItemServiceTests {
 
@@ -49,39 +47,6 @@ public class ItemServiceTests {
     private final UserMapper userMapper;
 
     private final BookingService bookingService;
-
-    @BeforeAll
-    public void setTestData() {
-        UserDto firstUserDto = new UserDto("First user", "first@email.com");
-        userService.createUser(firstUserDto);
-        UserDto secondUserDto = new UserDto("Second user", "second@email.com");
-        userService.createUser(secondUserDto);
-        UserDto thirdUserDto = new UserDto("Third user", "third@email.com");
-        userService.createUser(thirdUserDto);
-
-        ItemDto firstItem = ItemDto.builder()
-                .name("First item")
-                .description("Without description")
-                .available(true)
-                .owner(1L)
-                .build();
-        itemService.createItem(firstItem);
-        ItemDto secondItem = ItemDto.builder()
-                .name("Second item")
-                .description("To long description")
-                .available(true)
-                .owner(2L)
-                .build();
-        itemService.createItem(secondItem);
-        ItemDto thirdItem = ItemDto.builder()
-                .name("Third item")
-                .description("Another description")
-                .available(true)
-                .owner(1L)
-                .build();
-        itemService.createItem(thirdItem);
-
-    }
 
     @Test
     public void createItem_whenItemDtoCorrect_thenCreate() {

@@ -1,28 +1,25 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.services;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.auxiliary.exceptions.NotFoundException;
+import ru.practicum.shareit.auxiliary.exceptions.ValidationException;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.dto.BookingOutputMapper;
 import ru.practicum.shareit.booking.model.BookStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.dto.items.ItemDto;
-import ru.practicum.shareit.item.dto.items.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -33,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Sql({"/schema.sql", "/data.sql"})
 @ActiveProfiles("test")
 public class BookingServiceTests {
 
@@ -47,38 +44,9 @@ public class BookingServiceTests {
 
     private final UserService userService;
 
-    @BeforeAll
-    public void setTestData() {
-        UserDto firstUserDto = new UserDto("First user", "first@email.com");
-        userService.createUser(firstUserDto);
-        UserDto secondUserDto = new UserDto("Second user", "second@email.com");
-        userService.createUser(secondUserDto);
-        UserDto thirdUserDto = new UserDto("Third user", "third@email.com");
-        userService.createUser(thirdUserDto);
+    //private final ServerErrorHandler handler;
 
-        ItemDto firstItem = ItemDto.builder()
-                .name("First item")
-                .description("Without description")
-                .available(true)
-                .owner(1L)
-                .build();
-        itemRepository.save(ItemMapper.mapItemDtoToItem(firstItem));
-        ItemDto secondItem = ItemDto.builder()
-                .name("Second item")
-                .description("To long description")
-                .available(true)
-                .owner(2L)
-                .build();
-        itemRepository.save(ItemMapper.mapItemDtoToItem(secondItem));
-        ItemDto thirdItem = ItemDto.builder()
-                .name("Third item")
-                .description("Another description")
-                .available(true)
-                .owner(1L)
-                .build();
-        itemRepository.save(ItemMapper.mapItemDtoToItem(thirdItem));
-    }
-
+    //Testing addNewBooking
     @Test
     public void shouldAddNewBooking() {
         BookingInputDto newBooking = BookingInputDto.builder()
@@ -106,6 +74,46 @@ public class BookingServiceTests {
 
     }
 
+    @Test
+    public void shouldGetValidationExceptionWhenBookingOfOwnItem() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(1L)
+                .booker(1L)
+                .status("WAITING")
+                .build();
+        assertThrows(ValidationException.class, () -> bookingService.addNewBooking(newBooking));
+    }
+
+    @Test
+    public void shouldGetNotFoundExceptionWithBookingOfNotExistedItem() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(100L)
+                .booker(3L)
+                .status("WAITING")
+                .build();
+        assertThrows(NotFoundException.class, () -> bookingService.addNewBooking(newBooking));
+    }
+
+    @Test
+    public void shouldGetValidationExceptionWithBookingOfNotAvailableItem() {
+        BookingInputDto newBooking = BookingInputDto.builder()
+                .start(LocalDateTime.now().plusSeconds(1L))
+                .end(LocalDateTime.now().plusSeconds(2L))
+                .itemId(4L)
+                .booker(3L)
+                .status("WAITING")
+                .build();
+        assertThrows(ValidationException.class, () -> bookingService.addNewBooking(newBooking));
+        //verify(bookingService, times(1)).handler.handlerMyValidation(ValidationException e);
+
+        //assertEquals("Item is not available", e.message());
+    }
+
+    //Testing approveBooking
     @Test
     public void shouldApproveBooking() {
         BookingInputDto newBooking = BookingInputDto.builder()
@@ -135,6 +143,11 @@ public class BookingServiceTests {
         assertEquals(newBooking.getItemId(), bookingAfterApprove.getItem().getId());
         assertEquals(newBooking.getBooker(), bookingAfterApprove.getBooker().getId());
         assertEquals(BookStatus.APPROVED, bookingAfterApprove.getStatus());
+    }
+
+    @Test
+    public void approveBooking_whenApproveNotExistedBooking_thenNotFoundException() {
+        assertThrows(NotFoundException.class, () -> bookingService.approveBooking(1L,100L, true));
     }
 
     @Test

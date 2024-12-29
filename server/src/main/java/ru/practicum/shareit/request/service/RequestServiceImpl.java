@@ -63,7 +63,7 @@ public class RequestServiceImpl implements RequestService {
     //получить список запросов, созданных другими пользователями.
     //С помощью этого эндпоинта пользователи смогут просматривать существующие запросы, на которые они
     //могли бы ответить. Запросы сортируются по дате создания от более новых к более старым.
-    public List<RequestDto> getAllRequests(long id) {
+    public List<RequestDto> getAllAnotherUsersRequests(long id) {
         User requestor = userService.getUser(id); //получаем данные пользователя для запроса, проверяя существование
         List<ItemRequest> requests = repository.findByRequestorNotOrderByCreatedDesc(requestor);
         return RequestMapper.mapItemRequestListToRequestDtoList(requests);
