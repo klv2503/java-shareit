@@ -10,10 +10,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.auxiliary.exceptions.DuplicateDataException;
 import ru.practicum.shareit.auxiliary.exceptions.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
@@ -36,8 +36,6 @@ public class UserServiceTests {
     private final Environment env;
 
     private final UserService service;
-
-    private final UserMapper mapper;
 
     @Test
     void contextTest() {
@@ -63,6 +61,12 @@ public class UserServiceTests {
     }
 
     @Test
+    public void createUser_whenUsedEmail_thenDuplicateError() {
+        UserDto userDto = new UserDto("Name of User", "first@email.com");
+        assertThrows(DuplicateDataException.class, () -> service.createUser(userDto));
+    }
+
+    @Test
     public void updateUser_whenCorrectData_thenUpdate() {
         UserDto userDto = new UserDto(3L,"Name of User", "noch_eine@email.com");
         service.updateUser(userDto);
@@ -73,6 +77,48 @@ public class UserServiceTests {
 
         assertNotNull(user);
         assertEquals(userDto.getName(), user.getName());
+    }
+
+    @Test
+    public void updateUser_whenOnlyNewEmail_thenPartialUpdate() {
+        UserDto userDto = new UserDto(3L,"", "noch_eine@email.com");
+        service.updateUser(userDto);
+
+        User userAfterUpdate = service.getUser(3L);
+
+        assertNotNull(userAfterUpdate);
+        assertEquals("Third user", userAfterUpdate.getName());
+        assertEquals(userDto.getEmail(), userAfterUpdate.getEmail());
+    }
+
+    @Test
+    public void updateUser_whenOnlyNewName_thenPartialUpdate() {
+        UserDto userDto = new UserDto(3L,"New name", "");
+        service.updateUser(userDto);
+
+        User userAfterUpdate = service.getUser(3L);
+
+        assertNotNull(userAfterUpdate);
+        assertEquals(userDto.getName(), userAfterUpdate.getName());
+        assertEquals("third@email.com", userAfterUpdate.getEmail());
+    }
+
+    @Test
+    public void deleteUser_whenCorrectId_thenDelete() {
+        List<UserDto> users = service.getAllUsers();
+        int initialSize = users.size();
+        UserDto singleUser = users.getFirst();
+
+        service.deleteUser(singleUser.getId());
+
+        List<UserDto> usersNewList = service.getAllUsers();
+        assertEquals(initialSize - 1, usersNewList.size());
+        assertFalse(usersNewList.contains(singleUser));
+    }
+
+    @Test
+    public void deleteUser_whenWrongId_thenNotFoundException() {
+        assertThrows(NotFoundException.class, () -> service.deleteUser(100L));
     }
 
     @Test
@@ -108,12 +154,10 @@ public class UserServiceTests {
     @Test
     public void shouldGetAllUsers() {
 
-        TypedQuery<User> query = em.createQuery("Select u from User u ", User.class);
-        List<UserDto> users = mapper.mapUsersListToDtoList(query.getResultList());
-
-        System.out.println(users);
+        List<UserDto> users = service.getAllUsers();
 
         assertNotNull(users);
+        assertEquals(3, users.size());
         assertEquals("Second user", users.get(1).getName());
         assertEquals("third@email.com", users.get(2).getEmail());
 
